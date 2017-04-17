@@ -1,14 +1,15 @@
-using Newtonsoft.Json.Linq;
 using System;
-using System.IO;
+using System.Configuration;
 using System.Net.Http;
 using System.Web;
+using Newtonsoft.Json.Linq;
 
-namespace Lead_Verify_Sample
+
+namespace WhitePagesExample
 {
-    class Program
+    public class LeadVerify
     {
-        static void Main(string[] args)
+        public void Verify()
         {
             // Build the URI
             UriBuilder uri = new UriBuilder();
@@ -17,7 +18,8 @@ namespace Lead_Verify_Sample
             uri.Path = "/3.1/lead_verify.json";
 
             var parameters = HttpUtility.ParseQueryString(string.Empty);
-            parameters.Add("api_key", Environment.GetEnvironmentVariable("LEAD_VERIFY_API_KEY"));
+            parameters.Add("api_key", ConfigurationManager.AppSettings.Get("LEAD_VERIFY_API_KEY"));
+
             parameters.Add("name", "Drama Number");
             parameters.Add("phone", "6464806649");
             parameters.Add("email_address", "medjalloh1@yahoo.com");
@@ -30,8 +32,22 @@ namespace Lead_Verify_Sample
             uri.Query = parameters.ToString();
             using(var httpClient = new HttpClient())
             {
-                var rawJson = httpClient.GetStringAsync(uri.Uri).Result;
-            
+                string rawJson = null;
+
+                try
+                {
+                    rawJson = httpClient.GetStringAsync(uri.Uri).Result;
+                }
+                catch (AggregateException agEx)
+                {
+                    Console.WriteLine("****     LEAD VERIFY FAILED   *****");
+                    Console.WriteLine(agEx.InnerException.Message);
+                    Console.WriteLine("(Check LEAD_VERIFY_API_KEY value in App.config)");
+                    Console.WriteLine();
+                    return;
+                }            
+
+
                 // Parse JSON response
                 var jsonMap = JObject.Parse(rawJson);
 

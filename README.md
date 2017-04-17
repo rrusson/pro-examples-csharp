@@ -1,35 +1,24 @@
-# Whitepages Pro Code Examples in C# [![Build Status](https://travis-ci.org/whitepages/pro-examples-csharp.svg?branch=master)](https://travis-ci.org/whitepages/pro-examples-csharp)
+# Whitepages Pro Code Examples in C# for Visual Studio
 
 
-Use mcs and mono to compile and run C# sources on Mac OS X. Install mono and [nuget.sh].
+Use Visual Studio to compile and run C# implementation of WhitePages services.
 
 ## Install
-
-Install [Newtonsoft.Json]:
-
-```shell
-nuget.sh install Newtonsoft.Json -Version 8.0.3
-```
-
-## Compile
-
-Compile the sources:
+Install [Newtonsoft.Json] using NuGet GUI or command line:
 
 ```shell
-mcs -r:/path/to/Newtonsoft.Json.dll,System.Web.dll,System.Net.Http.dll IdentityCheck.cs
-mcs -r:/path/to/Newtonsoft.Json.dll,System.Web.dll,System.Net.Http.dll LeadVerify.cs
-mcs -r:/path/to/Newtonsoft.Json.dll,System.Web.dll,System.Net.Http.dll PhoneSearch.cs
+Install-Package Newtonsoft.Json
 ```
 
-## Run
+## Configure
+Edit the keys for IdentyCheck, LeadVerify, and PhoneSearch to the app.config file.
 
-Run the code with mono:
+
+## Run/Debug
+Compile and run the WhitePagesExample console application from Visual Studio.
 
 ```shell
-mono LeadVerify.exe
-mono IdentityCheck.exe
-mono PhoneSearch.exe
+ctrl-F5 / F5
 ```
 
-[nuget.sh]: https://gist.github.com/andypiper/2636885
-[Newtonsoft.Json]: http://www.newtonsoft.com/json
+[Newtonsoft.Json]: http://www.nuget.org/packages/Newtonsoft.Json/

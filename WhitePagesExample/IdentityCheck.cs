@@ -1,14 +1,15 @@
-using Newtonsoft.Json.Linq;
 using System;
-using System.IO;
+using System.Configuration;
 using System.Net.Http;
 using System.Web;
+using Newtonsoft.Json.Linq;
 
-namespace Identity_Check_Sample
+
+namespace WhitePagesExample
 {
-    class Program
+    public class IdentityCheck
     {
-        static void Main(string[] args)
+        public void Check()
         {
             // Build the URI
             UriBuilder uri = new UriBuilder();
@@ -17,7 +18,8 @@ namespace Identity_Check_Sample
             uri.Path = "/3.1/identity_check.json";
 
             var parameters = HttpUtility.ParseQueryString(string.Empty);
-            parameters.Add("api_key", Environment.GetEnvironmentVariable("ID_CHECK_API_KEY"));
+            parameters.Add("api_key", ConfigurationManager.AppSettings.Get("ID_CHECK_API_KEY"));
+
             parameters.Add("billing.name", "Drama Number");
             parameters.Add("billing.phone", "6464806649");
             parameters.Add("billing.address.street_line_1", "302 Gorham Ave");
@@ -37,18 +39,32 @@ namespace Identity_Check_Sample
 
             uri.Query = parameters.ToString();
 
-            using(var httpClient = new HttpClient())
+            using (var httpClient = new HttpClient())
             {
-                var rawJson = httpClient.GetStringAsync(uri.Uri).Result;
-            
+                string rawJson = null;
+
+                try
+                {
+                    rawJson = httpClient.GetStringAsync(uri.Uri).Result;
+                }
+                catch (AggregateException agEx)
+                {
+                    Console.WriteLine("****     IDENTITY CHECK FAILED   *****");
+                    Console.WriteLine(agEx.InnerException.Message);
+                    Console.WriteLine("(Check ID_CHECK_API_KEY value in App.config)");
+                    Console.WriteLine();
+                    return;
+                }
+
                 // Parse JSON response
                 var jsonMap = JObject.Parse(rawJson);
 
-                var availableChecks = new [] {"billing_name_checks", "billing_phone_checks", "billing_address_checks",
+                var availableChecks = new[] {"billing_name_checks", "billing_phone_checks", "billing_address_checks",
                                               "shipping_name_checks", "shipping_phone_checks", "shipping_address_checks",
                                               "email_address_checks", "ip_address_checks"};
                 // Display results
-                foreach (var check in availableChecks) {
+                foreach (var check in availableChecks)
+                {
                     Console.WriteLine(jsonMap[check].ToString());
                 }
             }
